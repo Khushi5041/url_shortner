@@ -1,50 +1,52 @@
 # Shortly — URL Shortener with Click Analytics
 
-Bitly-style MERN app: short codes, fast 302 redirects, async click logging, and an analytics dashboard (device, browser, referrer, country).
+A full-stack URL shortener with custom short links, QR code generation, fast redirects, and a dashboard for tracking link performance.
 
-## Stack
+## Live Demo
 
-- **Frontend:** React 18+ (Vite), Tailwind CSS, Recharts, qrcode.react, Axios
-- **Backend:** Node.js, Express, Mongoose, JWT, helmet, express-rate-limit
-- **Database:** MongoDB (local or Atlas)
+**[Open Shortly](https://url-shortner-five-dusky.vercel.app/)**
+
+- **Frontend:** Vercel
+- **Backend API:** Render
+- **Database:** MongoDB Atlas
+- **Source Code:** [GitHub Repository](https://github.com/Khushi5041/url_shortner)
 
 ## Features
 
-- Shorten URLs (anonymous or authenticated)
-- Custom aliases, expiry, click limits, password protection, one-time links
-- Fast redirect (`GET /s/:code`) with unique index + in-memory cache
-- Non-blocking click analytics (UA, referrer, geoip-lite, hashed IP)
-- Dashboard: search, enable/disable, delete, bulk actions, QR download
-- Analytics charts: clicks over time, devices, browsers, referrers, countries
-- Rate limiting, Helmet, destination URL validation (SSRF guard)
+- Create short URLs with unique short codes
+- Custom aliases, expiry, click limits, password protection, and one-time links
+- Fast `GET /s/:code` redirects using HTTP 302
+- QR code generation and download for short links
+- Click analytics dashboard with charts and breakdowns
+- Analytics for devices, browsers, referrers, and countries
+- Manage links with search, enable/disable, delete, and bulk actions
+- Authentication with JWT
+- Security protections including rate limiting, Helmet, and destination URL validation
 
-## Quick start (Mac)
+## Tech Stack
 
-### Prerequisites (one-time)
+| Area | Technologies |
+|---|---|
+| Frontend | React 18+, Vite, Tailwind CSS, Recharts, qrcode.react, Axios |
+| Backend | Node.js, Express.js, Mongoose, JWT |
+| Database | MongoDB Atlas |
+| Deployment | Vercel (frontend), Render (backend) |
 
-1. Install **Homebrew**: https://brew.sh
-2. Install **Node.js** and **MongoDB**:
+## Run Locally
+
+### Prerequisites
+
+- Node.js (v18+ recommended)
+- MongoDB local instance or a MongoDB Atlas connection string
+
+### 1. Clone the repository
 
 ```bash
-brew install node
-brew tap mongodb/brew
-brew install mongodb-community
-brew services start mongodb-community
+git clone https://github.com/Khushi5041/url_shortner.git
+cd url_shortner
 ```
 
-Confirm:
-
-```bash
-node -v    # should print v18+ or v20+
-mongosh --eval "db.runCommand({ ping: 1 })"
-```
-
-### Get the code
-
-- Clone from GitHub: `git clone <repo-url> && cd url_shortner`
-- Or unzip the project folder and `cd` into it.
-
-### Run backend (Terminal 1)
+### 2. Set up the backend
 
 ```bash
 cd server
@@ -53,52 +55,60 @@ npm install
 npm run dev
 ```
 
-API: http://localhost:5001
+Configure the required environment variables in `server/.env` using the names and format shown in `.env.example`. Keep real secrets private and never commit your `.env` file.
 
-### Run frontend (Terminal 2)
+Backend runs at `http://localhost:5001` (unless configured otherwise).
+
+### 3. Set up the frontend
+
+Open a second terminal:
 
 ```bash
 cd client
 cp .env.example .env
-yarn install
-# if yarn is missing: npm install -g yarn
-# if yarn fails: npm install && npm run dev
-yarn dev
+npm install
+npm run dev
 ```
 
-App: **http://localhost:5173**
+Set the frontend API URL in `client/.env` as shown in `client/.env.example`.
 
-Open that URL in the browser. Short links look like `http://localhost:5001/s/your-name`.
+Frontend runs at `http://localhost:5173`.
 
-## Key API routes
+## Key API Routes
 
-| Method | Path | Notes |
-|--------|------|--------|
-| `POST` | `/api/auth/register` | Create account |
-| `POST` | `/api/auth/login` | JWT login |
-| `POST` | `/api/urls` | Create short link (auth optional) |
-| `GET` | `/api/urls` | List user’s links |
-| `GET` | `/api/urls/:id/analytics` | Aggregations |
-| `POST` | `/api/urls/:code/verify` | Password unlock |
-| `GET` | `/s/:code` | **Hot path** — 302 redirect + async click log |
+| Method | Path | Description |
+|---|---|---|
+| `POST` | `/api/auth/register` | Create an account |
+| `POST` | `/api/auth/login` | Log in and receive a JWT |
+| `POST` | `/api/urls` | Create a short link |
+| `GET` | `/api/urls` | List the authenticated user's links |
+| `GET` | `/api/urls/:id/analytics` | Get link analytics |
+| `POST` | `/api/urls/:code/verify` | Verify a password-protected link |
+| `GET` | `/s/:code` | Redirect to the original URL |
 
-## Design choices (interview angles)
+## Implementation Highlights
 
-- **Codes:** 7-char base62 via `crypto.randomBytes` (~3.5×10¹² keyspace); retries on collision; custom aliases validated and uniqueness-checked.
-- **302 not 301:** temporary redirect so browsers don’t permanently cache; analytics and password/expiry changes stay accurate.
-- **Speed:** unique index on `code` + in-memory LRU cache; click write via `setImmediate` after `res.redirect`.
-- **Abuse:** rate limits, Helmet, block private IPs / localhost destinations.
+- **Short codes:** 7-character Base62 codes generated with `crypto.randomBytes`, with collision handling.
+- **HTTP 302 redirects:** Avoids permanent browser caching and keeps link behavior changeable.
+- **Redirect performance:** A unique database index and in-memory cache help resolve short codes quickly.
+- **Asynchronous analytics:** Click logging is performed after the redirect response is sent.
+- **Security:** Rate limiting, Helmet, and destination URL validation help protect the service.
 
-## Deployment sketch
+## Deployment
 
-1. Backend → Render/Railway with MongoDB Atlas; set `BASE_URL`, `CLIENT_URL`, `JWT_SECRET`.
-2. Point a short custom domain (A/CNAME) at the API; enable HTTPS.
-3. Frontend → Vercel on a dashboard subdomain; root domain serves redirects.
-4. Keep rate limiting and URL validation on in production.
+- The React/Vite frontend is deployed on **Vercel**.
+- The Express backend is deployed on **Render**.
+- **MongoDB Atlas** hosts the production database.
 
-## Project layout
+## Project Structure
 
 ```
-server/src/   Express API, models, redirect hot path
-client/src/   React dashboard & landing page
+server/
+  src/       Express API, models, and redirect logic
+client/
+  src/       React application and dashboard
 ```
+
+---
+
+If you find this project useful, feel free to explore the repository and try the [live demo](https://url-shortner-five-dusky.vercel.app/).
