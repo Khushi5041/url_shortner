@@ -4,7 +4,7 @@ A full-stack URL shortener with custom short links, QR code generation, fast red
 
 ## Live Demo
 
-**[Open Shortly](https://url-shortner-five-dusky.vercel.app/)**
+**[Open Shortly](https://khushi-url-shortner.vercel.app/)**
 
 - **Frontend:** Vercel
 - **Backend API:** Render
@@ -111,4 +111,4 @@ client/
 
 ---
 
-If you find this project useful, feel free to explore the repository and try the [live demo](https://url-shortner-five-dusky.vercel.app/).
+If you find this project useful, feel free to explore the repository and try the [live demo](https://khushi-url-shortner.vercel.app/).
