@@ -8,3 +8,4 @@ coverage/
 .vite/
 client/yarn.lock
 server/package-lock.json
+client/package-lock.backup.json
