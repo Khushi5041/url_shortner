@@ -1,0 +1,10 @@
+node_modules/
+dist/
+build/
+.env
+.DS_Store
+*.log
+coverage/
+.vite/
+client/yarn.lock
+server/package-lock.json
